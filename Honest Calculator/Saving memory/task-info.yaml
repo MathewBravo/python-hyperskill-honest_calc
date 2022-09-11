@@ -1,0 +1,135 @@
+type: edu
+files:
+- name: honest_calc.py
+  visible: true
+  text: |
+    # write your code here
+  learner_created: false
+- name: tests.py
+  visible: false
+  text: |
+    from hstest import StageTest, CheckResult, WrongAnswer, dynamic_test, TestedProgram
+
+    msg = ["Enter an equation",
+           "Do you even know what numbers are? Stay focused!",
+           "Yes ... an interesting math operation. You've slept through all classes, haven't you?",
+           "Yeah... division by zero. Smart move...",
+           "Do you want to store the result? (y / n):",
+           "Do you want to continue calculations? (y / n):",
+           " ... lazy",
+           " ... very lazy",
+           " ... very, very lazy",
+           "You are",
+           "Are you sure? It is only one digit! (y / n)",
+           "Don't be silly! It's just one number! Add to the memory? (y / n)",
+           "Last chance! Do you really want to embarrass yourself? (y / n)"
+    ]
+
+
+    def add_enter(txt):
+        return "\n".join([txt, msg[0]])
+
+
+    def add_memory(txt):
+        return "\n".join([txt, msg[4]])
+
+
+    data = [(("4 * 5.0", "\n".join([msg[9] + msg[6], add_memory("20.0")])), ("n", msg[5]), ("n", "")),
+            (("2 + 5.5", add_memory("7.5")), ("y", msg[5]), ("y", msg[0]), ("M - 9", add_memory("-1.5")), ("n", msg[5]), ("n", "")),
+            (("225 / 15", add_memory("15.0")), ("y", msg[5]), ("y",msg[0]),
+             ("1 * 5", "\n".join([msg[9] + msg[6] + msg[7], add_memory("5.0")])), ("y", msg[10]), ("y", msg[11]), ("n", msg[5]), ("y", msg[0]),
+            ("M - 10", add_memory("5.0")), ("y", msg[10]), ("y", msg[11]), ("y", msg[12]), ("y", msg[5]), ("y", msg[0]),
+             ("M / M",  "\n".join([msg[9] + msg[6], add_memory("1.0")])), ("n", msg[5]), ("n", "")),
+           ]  # (input data, msg sentence])
+
+
+    class HonestCalc(StageTest):
+        @dynamic_test(data=data)
+        def test(self, *items):
+            pr = TestedProgram()
+            output = pr.start()
+            if msg[0] not in output:
+                return CheckResult.wrong(f"Expected: ({msg[0]});\nFound:    ({output.strip()})")
+            for item in items:
+                output = pr.execute(item[0])
+                if item[1] != output.strip():
+                    return CheckResult.wrong(f"Expected:\n{item[1]}\nFound:\n{output.strip()}")
+            if not pr.is_finished():
+                return CheckResult.wrong("Your program unnecessarily waiting for input.")
+            return CheckResult.correct()
+
+
+    if __name__ == '__main__':
+        HonestCalc().run_tests()
+  learner_created: false
+- name: menu_handler.py
+  visible: true
+  text: |
+    import string
+
+
+    def validate_numbers(x, y) -> bool:
+        try:
+            float(x)
+            float(y)
+            return True
+        except ValueError:
+            return False
+
+
+    def validate_operator(op) -> bool:
+        operators = ['+', '-', '*', '/']
+        if op in operators:
+            return True
+        else:
+            return False
+
+
+    def ask_for_equation():
+        print("Enter an equation")
+
+
+    def process_equation(x, y, op) -> float:
+        if op == '+':
+            return x + y
+        elif op == '-':
+            return x - y
+        elif op == '*':
+            return x * y
+        elif op == '/' and not (x == 0 or y == 0):
+            return x / y
+
+
+    def process_laziness(x: float, y: float, op: string):
+        prefix = "You are"
+        laziness = [
+            " ... lazy",
+            " ... very lazy",
+            " ... very, very lazy",
+        ]
+        message = ""
+        if x.is_integer() and y.is_integer():
+            if x in range(-10,10) and y in range(-10, 10):
+                message = message + laziness[0]
+        if (x == 1 or y == 1) and op == '*':
+            message = message + laziness[1]
+        if (x == 0 or y == 0) and (op == '*' or op == '+' or op == '-'):
+            message = message + laziness[2]
+        if message != "":
+            message = prefix + message
+            print(message)
+  learner_created: true
+- name: memory.py
+  visible: true
+  text: |
+    class Memory:
+        def __init__(self, result: float):
+            self.result = result
+  learner_created: true
+feedback_link: https://hyperskill.org/learn/step/15814#comment
+status: Solved
+feedback:
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">JetBrains
+    Academy</a> to continue learning.
+  time: Sun, 11 Sep 2022 21:04:08 UTC
+record: -1
